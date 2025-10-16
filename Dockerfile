@@ -9,7 +9,8 @@ FROM nvidia/cuda:12.1.1-base-ubuntu22.04
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TRANSFORMERS_CACHE=/root/.cache/huggingface
 ENV HF_HOME=/root/.cache/huggingface
-ENV PYTHONUNBUFFERED=1  # ensures logs are streamed instantly
+# ensures logs are streamed instantly
+ENV PYTHONUNBUFFERED=1
 
 RUN apt-get update && apt-get install -y \
     python3 python3-pip git wget curl vim \
@@ -31,7 +32,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # ⚡ Optional: Pre-Download Model
 # =====================================
 # Skip pre-download during build; model will load dynamically at runtime
-# This avoids long image build times and RunPod timeouts.
 # To prefetch, you could uncomment and pass HF_TOKEN as build arg if needed.
 # ARG HF_TOKEN
 # RUN python3 -c "from transformers import AutoTokenizer, AutoModelForCausalLM; \
