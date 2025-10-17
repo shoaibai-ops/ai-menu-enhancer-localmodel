@@ -5,7 +5,7 @@ flask-cors
 # Model + performance
 transformers>=4.40.0
 torch>=2.1.0
-accelerate
+
 safetensors
 sentencepiece
 
@@ -19,3 +19,8 @@ runpod
 requests
 
 huggingface-hub
+
+
+accelerate>=0.25.0
+
+python-dotenv
