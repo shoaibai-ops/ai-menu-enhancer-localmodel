@@ -3,7 +3,7 @@ import torch
 import logging
 from deep_translator import GoogleTranslator as Translator
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
-
+#
 # ------------------------------
 # Logging Setup
 # ------------------------------
