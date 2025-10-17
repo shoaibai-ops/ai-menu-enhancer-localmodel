@@ -1,14 +1,12 @@
 import os
 import torch
 import logging
-from dotenv import load_dotenv
 from deep_translator import GoogleTranslator as Translator
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 
 # ------------------------------
-# Load environment and logging
+# Logging Setup
 # ------------------------------
-load_dotenv()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -18,6 +16,8 @@ logger = logging.getLogger(__name__)
 HF_TOKEN = os.getenv("HF_TOKEN")
 if not HF_TOKEN:
     logger.warning("⚠️ HF_TOKEN not found — model loading may fail for private models.")
+else:
+    logger.info(f"🔑 HF_TOKEN detected: {HF_TOKEN[:8]}********")
 
 # ------------------------------
 # Model Setup (Lazy Load)
@@ -26,12 +26,16 @@ MODEL_NAME = "deepseek-ai/DeepSeek-V3.1"
 pipe = None
 
 def get_pipeline():
+    """Lazy load model only once per container."""
     global pipe
     if pipe is None:
         logger.info("🚀 Loading DeepSeek-V3.1 model...")
         torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
 
-        tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, use_auth_token=HF_TOKEN)
+        tokenizer = AutoTokenizer.from_pretrained(
+            MODEL_NAME,
+            use_auth_token=HF_TOKEN
+        )
         model = AutoModelForCausalLM.from_pretrained(
             MODEL_NAME,
             use_auth_token=HF_TOKEN,
@@ -61,6 +65,7 @@ TONE_INSTRUCTIONS = {
 FLUFF_WORDS = ["enjoy", "try", "savor", "delight", "experience"]
 
 def generate_description(original: str, tone: str = "premium", language: str = "en") -> str:
+    """Generate a restaurant-style menu description."""
     prompt = f"""
 You are a restaurant branding expert. Rewrite the following text into a polished, appetizing menu description.
 
