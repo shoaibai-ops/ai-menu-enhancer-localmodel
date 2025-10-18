@@ -3,7 +3,7 @@ import torch
 import logging
 from deep_translator import GoogleTranslator as Translator
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
-#
+
 # ------------------------------
 # Logging Setup
 # ------------------------------
@@ -20,21 +20,22 @@ if not HF_TOKEN:
 # ------------------------------
 # Model Setup (Lazy Load)
 # ------------------------------
-MODEL_NAME = "deepseek-ai/DeepSeek-V3.1"
+MODEL_NAME = "NousResearch/Nous-Hermes-2-Mistral-7B-DPO"
 pipe = None  # Lazy initialization
 
 def get_pipeline():
-    """Load the DeepSeek model only once per container (lazy load)."""
+    """Load the Nous Hermes 2 Mistral model only once per container."""
     global pipe
     if pipe is None:
-        logger.info("🚀 Loading DeepSeek-V3.1 model for the first time...")
+        logger.info(f"🚀 Loading model: {MODEL_NAME}")
 
         tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, token=HF_TOKEN)
         model = AutoModelForCausalLM.from_pretrained(
             MODEL_NAME,
             token=HF_TOKEN,
-            torch_dtype=torch.float16,
-            device_map="auto"
+            torch_dtype=torch.float16,  # FP16 for reduced memory
+            device_map="auto",
+            low_cpu_mem_usage=True
         )
 
         pipe = pipeline(
@@ -47,6 +48,7 @@ def get_pipeline():
 
         logger.info("✅ Model loaded successfully.")
     return pipe
+
 
 # ------------------------------
 # Tone Instructions
@@ -84,7 +86,7 @@ Enhanced description:
 
     try:
         pipe = get_pipeline()
-        outputs = pipe(prompt, max_new_tokens=200, temperature=0.3, top_p=0.9)
+        outputs = pipe(prompt, max_new_tokens=150, temperature=0.3, top_p=0.9)
         result = outputs[0]["generated_text"].replace(prompt, "").strip()
 
         # Optional translation if not English

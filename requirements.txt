@@ -1,13 +1,14 @@
-# Flask + CORS (for local or health check)
+# Web framework
 flask
 flask-cors
 
-# Model + performance
+# Transformers + Model dependencies
 transformers>=4.40.0
 torch>=2.1.0
 accelerate
 safetensors
 sentencepiece
+huggingface-hub
 
 # Translation
 deep-translator
@@ -17,5 +18,3 @@ runpod
 
 # Utilities
 requests
-
-huggingface-hub
