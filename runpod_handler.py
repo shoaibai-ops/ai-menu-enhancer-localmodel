@@ -21,13 +21,10 @@ health_app = Flask(__name__)
 
 @health_app.route("/health", methods=["GET"])
 def health():
-    return jsonify({
-        "status": "ok",
-        "message": "Nous-Hermes-2-Mistral-7B-DPO model ready!"
-    })
+    return jsonify({"status": "ok", "message": "DeepSeek model ready!"})
 
 def start_health_server():
-    """Start the healthcheck Flask server in a background thread."""
+    """Starts healthcheck server on port 8080 in a background thread."""
     def run_server():
         health_app.run(host="0.0.0.0", port=8080, debug=False, use_reloader=False)
 
@@ -39,7 +36,7 @@ def start_health_server():
 # ==========================================================
 def handler(event):
     try:
-        from app import generate_description  # Lazy import — avoids blocking cold start
+        from app import generate_description  # Lazy import — prevents cold start hang
         logger.info("📩 New request received")
 
         # Extract input safely
@@ -55,7 +52,7 @@ def handler(event):
         logger.info(f"🧠 Processing input: {original[:80]}...")
         logger.info(f"🎨 Tone: {tone} | 🌐 Language: {language}")
 
-        # Generate enhanced description
+        # Generate description
         result = generate_description(original, tone, language)
 
         logger.info("✅ Successfully generated enhanced description.")
@@ -75,7 +72,4 @@ def handler(event):
 if __name__ == "__main__":
     logger.info("🚀 Starting RunPod handler + healthcheck server...")
     start_health_server()
-    try:
-        runpod.serverless.start({"handler": handler})
-    except Exception as e:
-        logger.error(f"❌ Failed to start RunPod serverless handler: {e}", exc_info=True)
+    runpod.serverless.start({"handler": handler})
